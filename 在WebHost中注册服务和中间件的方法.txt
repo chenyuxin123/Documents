@@ -1,0 +1,64 @@
+一.在WebHost中注册服务和中间件的方法
+1.Startup 对象
+
+
+2.IHostingStartup，该接口提供我们在其他程序集中注册服务和中间件的方法
+
+①实现 IHostingStartup 接口，并指定 HostingStartupAttribute 程序集特性
+[assembly: HostingStartup(typeof(MyDll.Startups.MyStartup))]
+namespace MyDll.Startups
+{
+    public class MyStartup : IHostingStartup
+    {
+        public void Configure(IWebHostBuilder builder)
+        {
+            //注册服务
+            builder.ConfigureServices(service => service.AddSingleton<ITestService, MyService>());
+
+            //注册中间件
+            builder.Configure(app => app.Use(next =>
+            {
+                return async context =>
+                {
+                    Console.WriteLine("Hello World!");
+                    await System.Threading.Tasks.Task.Delay(0);
+                };
+            }));
+        }
+    }
+}
+
+②配置 HostingStartupAssembliesKey 的值，多个程序集之间用“；”分隔
+public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
+            WebHost.CreateDefaultBuilder(args)
+                .UseSetting(WebHostDefaults.HostingStartupAssembliesKey, "MyDll")
+                .UseStartup<Startup>();
+
+
+说明：IHostingStartup 是由 WebHostBuilder 在创建 WebHost 时调用的，且执行时机最早。
+
+
+3.IStartupFilter，顾名思义，该接口是对 Starup 类中 Configure 方法的拦截器，用于在 Startup 的 Configure 方法之前注册中间件
+
+①实现 IStartupFilter 接口
+public class MyStartupFilter : IStartupFilter
+{
+    public Action<IApplicationBuilder> Configure(Action<IApplicationBuilder> next)
+    {
+        return app =>
+        {
+            Console.WriteLine("MyStartupFilter");
+            next(app);
+        };
+    }
+}
+
+②将拦截器注册到 DI 中
+public void ConfigureServices(IServiceCollection services)
+{
+    services.AddSingleton<IStartupFilter, MyStartupFilter>();
+}
+
+
+注意：WebHost 在执行 Starup 类中 Configure 方法之前，会从 DI 系统中获取所有的 IStartupFilter 来执行。
+
