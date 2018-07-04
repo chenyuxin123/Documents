@@ -1,10 +1,10 @@
-Ò».ÔÚWebHostÖĞ×¢²á·şÎñºÍÖĞ¼ä¼şµÄ·½·¨
-1.Startup ¶ÔÏó
+ä¸€.åœ¨WebHostä¸­æ³¨å†ŒæœåŠ¡å’Œä¸­é—´ä»¶çš„æ–¹æ³•
+1.Startup å¯¹è±¡
 
 
-2.IHostingStartup£¬¸Ã½Ó¿ÚÌá¹©ÎÒÃÇÔÚÆäËû³ÌĞò¼¯ÖĞ×¢²á·şÎñºÍÖĞ¼ä¼şµÄ·½·¨
+2.IHostingStartupï¼Œè¯¥æ¥å£æä¾›æˆ‘ä»¬åœ¨å…¶ä»–ç¨‹åºé›†ä¸­æ³¨å†ŒæœåŠ¡å’Œä¸­é—´ä»¶çš„æ–¹æ³•
 
-¢ÙÊµÏÖ IHostingStartup ½Ó¿Ú£¬²¢Ö¸¶¨ HostingStartupAttribute ³ÌĞò¼¯ÌØĞÔ
+1)å®ç° IHostingStartup æ¥å£ï¼Œå¹¶æŒ‡å®š HostingStartupAttribute ç¨‹åºé›†ç‰¹æ€§
 [assembly: HostingStartup(typeof(MyDll.Startups.MyStartup))]
 namespace MyDll.Startups
 {
@@ -12,10 +12,10 @@ namespace MyDll.Startups
     {
         public void Configure(IWebHostBuilder builder)
         {
-            //×¢²á·şÎñ
+            //æ³¨å†ŒæœåŠ¡
             builder.ConfigureServices(service => service.AddSingleton<ITestService, MyService>());
 
-            //×¢²áÖĞ¼ä¼ş
+            //æ³¨å†Œä¸­é—´ä»¶
             builder.Configure(app => app.Use(next =>
             {
                 return async context =>
@@ -28,19 +28,19 @@ namespace MyDll.Startups
     }
 }
 
-¢ÚÅäÖÃ HostingStartupAssembliesKey µÄÖµ£¬¶à¸ö³ÌĞò¼¯Ö®¼äÓÃ¡°£»¡±·Ö¸ô
+2)é…ç½® HostingStartupAssembliesKey çš„å€¼ï¼Œå¤šä¸ªç¨‹åºé›†ä¹‹é—´ç”¨â€œï¼›â€åˆ†éš”
 public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
                 .UseSetting(WebHostDefaults.HostingStartupAssembliesKey, "MyDll")
                 .UseStartup<Startup>();
 
 
-ËµÃ÷£ºIHostingStartup ÊÇÓÉ WebHostBuilder ÔÚ´´½¨ WebHost Ê±µ÷ÓÃµÄ£¬ÇÒÖ´ĞĞÊ±»ú×îÔç¡£
+è¯´æ˜ï¼šIHostingStartup æ˜¯ç”± WebHostBuilder åœ¨åˆ›å»º WebHost æ—¶è°ƒç”¨çš„ï¼Œä¸”æ‰§è¡Œæ—¶æœºæœ€æ—©ã€‚
 
 
-3.IStartupFilter£¬¹ËÃûË¼Òå£¬¸Ã½Ó¿ÚÊÇ¶Ô Starup ÀàÖĞ Configure ·½·¨µÄÀ¹½ØÆ÷£¬ÓÃÓÚÔÚ Startup µÄ Configure ·½·¨Ö®Ç°×¢²áÖĞ¼ä¼ş
+3.IStartupFilterï¼Œé¡¾åæ€ä¹‰ï¼Œè¯¥æ¥å£æ˜¯å¯¹ Starup ç±»ä¸­ Configure æ–¹æ³•çš„æ‹¦æˆªå™¨ï¼Œç”¨äºåœ¨ Startup çš„ Configure æ–¹æ³•ä¹‹å‰æ³¨å†Œä¸­é—´ä»¶
 
-¢ÙÊµÏÖ IStartupFilter ½Ó¿Ú
+1)å®ç° IStartupFilter æ¥å£
 public class MyStartupFilter : IStartupFilter
 {
     public Action<IApplicationBuilder> Configure(Action<IApplicationBuilder> next)
@@ -53,12 +53,12 @@ public class MyStartupFilter : IStartupFilter
     }
 }
 
-¢Ú½«À¹½ØÆ÷×¢²áµ½ DI ÖĞ
+2)å°†æ‹¦æˆªå™¨æ³¨å†Œåˆ° DI ä¸­
 public void ConfigureServices(IServiceCollection services)
 {
     services.AddSingleton<IStartupFilter, MyStartupFilter>();
 }
 
 
-×¢Òâ£ºWebHost ÔÚÖ´ĞĞ Starup ÀàÖĞ Configure ·½·¨Ö®Ç°£¬»á´Ó DI ÏµÍ³ÖĞ»ñÈ¡ËùÓĞµÄ IStartupFilter À´Ö´ĞĞ¡£
+æ³¨æ„ï¼šWebHost åœ¨æ‰§è¡Œ Starup ç±»ä¸­ Configure æ–¹æ³•ä¹‹å‰ï¼Œä¼šä» DI ç³»ç»Ÿä¸­è·å–æ‰€æœ‰çš„ IStartupFilter æ¥æ‰§è¡Œã€‚
 
